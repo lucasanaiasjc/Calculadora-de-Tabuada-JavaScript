@@ -57,6 +57,8 @@ function ViewComponent(parent) {
             }, { width: '40px' })
             // 
             this.inputNumber.addEventListener('change', (e) => {
+                // garantir valor entre 1 e 10
+                e.target.value = Math.min(Math.max(e.target.value, 1), 10)
                 this.renderResult()
             })
         },
