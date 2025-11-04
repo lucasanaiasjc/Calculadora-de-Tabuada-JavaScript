@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Tabuada</title>
+    <style>
+        .selected {
+            background-color: #F4F4F4
+        }
+
+        html,
+        body,
+        ul,
+        li {
+            margin: 0;
+            padding: 0;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li {
+            padding: 1em;
+            border: 1px solid #C4C4C4;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Cria um nó de texto (TextNode)
+        function Text(value) {
+            return document.createTextNode(value)
+        }
+
+        // Cria um elemento HTML genérico (widget), adiciona filhos, atributos, eventos, classes e style
+        function Widget({ tag = 'div', child = null, children = [], attr = {}, events = {}, className = [], style = {} }) {
+            const element = document.createElement(tag)
+            // filho único
+            if (child)
+                if (child instanceof Node) element.append(child)
+                else throw new Error('O parâmetro "child" deve ser um nó (Node).')
+            // diversos filhos
+            children.map((widget) => {
+                if (widget instanceof Node) element.append(widget)
+                else throw new Error('Todos os itens em "children" devem ser nós (Node).')
+            })
+            // atributos
+            Object.keys(attr).forEach((key) => element.setAttribute(key, attr[key]));
+            // eventos
+            Object.keys(events).forEach((key) => element.addEventListener(key, events[key]));
+            // eventos
+            className.map((value) => value !== null ? element.classList.add(value) : null);
+            // styles
+            Object.assign(element.style, style)
+
+            return element
+        }
+
+        // Ponto de partida da aplicação
+        function App(children = []) {
+            const el = document.body
+            children.map((widget) => el.append(widget))
+        }
+
+        // Calcular resultado da tabuada da opção escolhida
+        function calculate(choice = 1) {
+            const options = []
+            const results = []
+
+            for (let x = 1; x <= 10; x++) {
+                options.push(Text(`Tabuada do ${x}`))
+                results.push(Text(`${choice} x ${x} = ${choice * x}`))
+            }
+
+            return {
+                options,
+                results
+            }
+        }
+
+        // Apresentar resultado
+        function view(choice = 1) {
+            // valida entrada
+            if (choice < 1) choice = 1
+            else if (choice > 10) choice = 10
+
+            const { options, results } = calculate(choice)
+
+            return Widget({
+                children: [
+                    Widget({
+                        tag: 'ul',
+                        children: options.map((option, index) => Widget({
+                            tag: 'li',
+                            child: option,
+                            className: [choice == (index + 1) ? 'selected' : null],
+                            events: {
+                                click: (e) => {
+                                    const input = document.querySelector('input[type=number]')
+                                    input.setAttribute('value', index + 1)
+                                    renderView(index + 1)
+                                }
+                            }
+                        }))
+                    }),
+                    Widget({
+                        tag: 'ul',
+                        children: results.map((result) => Widget({
+                            tag: 'li',
+                            child: result
+                        }))
+                    })
+                ],
+                style: {
+                    display: 'flex',
+                    justifyContent: 'center',
+                    maxWidth: '500px',
+                    margin: '0 auto'
+                }
+            })
+        }
+
+        // Renderiza o conteudo do #view
+        function renderView(choice = 1) {
+            const element = document.getElementById('view')
+            element.innerHTML = ''
+            element.appendChild(view(choice))
+        }
+
+        // Executa após o carregamento completo do documento
+        window.onload = () => {
+            App([
+                Widget({
+                    tag: 'header',
+                    child: Text('Calculadora de Tabuada'),
+                    style: {
+                        padding: '1em',
+                        fontSize: '1.5em',
+                        textAlign: 'center',
+                        background: '#F1F1F1',
+                        borderBottom: '2px solid #C1C1C1'
+                    }
+                }),
+                Widget({
+                    tag: 'main',
+                    children: [
+                        Widget({
+                            tag: 'form',
+                            child: Widget({
+                                children: [
+                                    Widget({
+                                        tag: 'label',
+                                        attr: { for: 'choice' },
+                                        child: Text('Escolha uma tabuada:')
+                                    }),
+                                    Widget({
+                                        tag: 'input',
+                                        attr: { type: 'number', id: 'choice', title: 'Escolha uma tabuada', placeholder: 'Tabuada desejada', value: 1, min: 1, max: 10 },
+                                        events: { change: (e) => renderView(e.target.value) }
+                                    })
+                                ],
+                                style: {
+                                    padding: '0.5em',
+                                    display: 'flex',
+                                    flexDirection: 'column'
+                                }
+                            }),
+                            style: {
+                                maxWidth: '300px',
+                                marginLeft: 'auto',
+                                marginRight: 'auto'
+                            }
+                        }),
+                        Widget({
+                            attr: { 'id': 'view' },
+                            child: view()
+                        })
+                    ]
+                }),
+                Widget({
+                    tag: 'footer',
+                    child: Text('Por: Lucas Anaia'),
+                    style: {
+                        textAlign: 'center',
+                        paddingTop: '1em'
+                    }
+                })
+            ])
+        }
+    </script>
+</body>
+
+</html>
