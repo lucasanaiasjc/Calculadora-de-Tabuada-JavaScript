@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Tabuada</title>
+    <title>Gerador de Tabuada Interativo</title>
     <style>
         .selected {
             background-color: #F4F4F4
@@ -136,7 +136,7 @@
             App([
                 Widget({
                     tag: 'header',
-                    child: Text('Calculadora de Tabuada'),
+                    child: Text('Gerador de Tabuada Interativo'),
                     style: {
                         padding: '1em',
                         fontSize: '1.5em',
@@ -160,7 +160,12 @@
                                     Widget({
                                         tag: 'input',
                                         attr: { type: 'number', id: 'choice', title: 'Escolha uma tabuada', placeholder: 'Tabuada desejada', value: 1, min: 1, max: 10 },
-                                        events: { change: (e) => renderView(e.target.value) }
+                                        events: {
+                                            change: (e) => {
+                                                const choice = e.target.value == '' ? 1 : parseInt(e.target.value) ?? 1
+                                                renderView(choice)
+                                            }
+                                        }
                                     })
                                 ],
                                 style: {
@@ -169,6 +174,7 @@
                                     flexDirection: 'column'
                                 }
                             }),
+                            events: { submit: (e) => e.preventDefault() },
                             style: {
                                 maxWidth: '300px',
                                 marginLeft: 'auto',
